@@ -1,10 +1,102 @@
 ﻿@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Expense Management System";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@if (!string.IsNullOrEmpty(Model.ErrorMessage))
+{
+    <div class="alert alert-danger" role="alert">
+        <strong>Database Connection Error:</strong> @Model.ErrorMessage
+        <br /><small>Showing dummy data for demonstration purposes.</small>
+    </div>
+}
+
+<div class="container mt-4">
+    <h1 class="mb-4">Expense Management System</h1>
+    
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <input type="text" id="searchFilter" class="form-control" placeholder="Filter expenses..." onkeyup="filterExpenses()" />
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="/AddExpense" class="btn btn-primary">Add New Expense</a>
+            <a href="/Approve" class="btn btn-success">Approve Expenses</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="expensesTable">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Description</th>
+                            <th>User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var expense in Model.Expenses)
+                        {
+                            <tr>
+                                <td>@expense.ExpenseDate.ToString("dd/MM/yyyy")</td>
+                                <td>@expense.CategoryName</td>
+                                <td>£@expense.AmountGBP.ToString("0.00")</td>
+                                <td>
+                                    @if (expense.StatusName == "Approved")
+                                    {
+                                        <span class="badge bg-success">@expense.StatusName</span>
+                                    }
+                                    else if (expense.StatusName == "Submitted")
+                                    {
+                                        <span class="badge bg-warning text-dark">@expense.StatusName</span>
+                                    }
+                                    else if (expense.StatusName == "Rejected")
+                                    {
+                                        <span class="badge bg-danger">@expense.StatusName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@expense.StatusName</span>
+                                    }
+                                </td>
+                                <td>@expense.Description</td>
+                                <td>@expense.UserName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function filterExpenses() {
+    var input = document.getElementById('searchFilter');
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById('expensesTable');
+    var tr = table.getElementsByTagName('tr');
+    
+    for (var i = 1; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName('td');
+        var found = false;
+        
+        for (var j = 0; j < td.length; j++) {
+            if (td[j]) {
+                var txtValue = td[j].textContent || td[j].innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        
+        tr[i].style.display = found ? '' : 'none';
+    }
+}
+</script>

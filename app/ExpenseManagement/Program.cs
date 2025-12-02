@@ -8,8 +8,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register DatabaseService
+// Register DatabaseService and ChatService
 builder.Services.AddSingleton<DatabaseService>();
+builder.Services.AddSingleton<ChatService>();
 
 // Add CORS for chatui
 builder.Services.AddCors(options =>
